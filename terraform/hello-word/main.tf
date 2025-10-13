@@ -3,12 +3,12 @@ provider "aws" {
     region = "us-east-1"
 }
 
-#Crear instancia ec2
+Crear instancia ec2
 resource "aws_instance" "hello-word" {
   instance_type = "t2.micro"
   ami = "ami-052064a798f08f0d3"
 
   tags = {
-    Name = "Terraform-primer-vistazo"
+    Name = "Terraform-segundo-vistazo"
   }
 }

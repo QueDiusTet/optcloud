@@ -1,56 +1,73 @@
+# main.tf 
 provider "aws" {
   region = "us-east-1"
 }
+resource "aws_vpc" "vpc_prinsipal" {
+    cidr_block  = "10.0.0.0/16"
+    enable_dns_support = true
+    enable_dns_hostnames = true
 
-resource "aws_vpc" "vpc" {
-  cidr_block = "10.0.0.0/16"
-  tags = { Name = "pt1-3-ex2-vpc" }
+    tags = {
+        Name = "LLUK-VPC"
+    }
 }
-
-resource "aws_subnet" "A" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.32.0/25"
+resource "aws_subnet" "subnetA" {
+  vpc_id = aws_vpc.vpc_prinsipal.id
+  cidr_block = "10.0.32.0/25"
   availability_zone = "us-east-1a"
-  tags = { Name = "subnet-A" }
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "SubnetA"
+  }
 }
-
-resource "aws_subnet" "B" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.30.0/23"
+resource "aws_subnet" "subnetB" {
+  vpc_id = aws_vpc.vpc_prinsipal.id
+  cidr_block = "10.0.30.0/23"
   availability_zone = "us-east-1a"
-  tags = { Name = "subnet-B" }
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "SubnetB"
+  }
 }
-
-resource "aws_subnet" "C" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.33.0/28"
+resource "aws_subnet" "subnetC" {
+  vpc_id = aws_vpc.vpc_prinsipal.id
+  cidr_block = "10.0.33.0/28"
   availability_zone = "us-east-1a"
-  tags = { Name = "subnet-C" }
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "SubnetC"
+  }
 }
-
-resource "aws_instance" "A_instances" {
-  count         = 2
-  ami           = var.ami_id
+# Subnet A
+resource "aws_instance" "maquinas_subnetA" {
+  count = 2
+  ami = "ami-052064a798f08f0d3"
   instance_type = "t3.micro"
-  key_name      = var.key_name
-  subnet_id     = aws_subnet.A.id
-  tags = { Name = "A-${count.index + 1}" }
+  subnet_id = aws_subnet.subnetA.id
+  tags = {
+ 
+    Name = "SubnetA-Instance-${count.index + 1}"
+  }
 }
-
-resource "aws_instance" "B_instances" {
-  count         = 2
-  ami           = var.ami_id
+# Subnet B
+resource "aws_instance" "maquinas_subnetB" {
+  count = 2
+  ami = "ami-052064a798f08f0d3"
   instance_type = "t3.micro"
-  key_name      = var.key_name
-  subnet_id     = aws_subnet.B.id
-  tags = { Name = "B-${count.index + 1}" }
+  subnet_id = aws_subnet.subnetB.id
+  tags = {
+ 
+    Name = "SubnetB-Instance-${count.index + 1}"
+  }
 }
-
-resource "aws_instance" "C_instances" {
-  count         = 2
-  ami           = var.ami_id
+# Subnet C
+resource "aws_instance" "maquinas_subnetC" {
+  count = 2
+  ami = "ami-052064a798f08f0d3"
   instance_type = "t3.micro"
-  key_name      = var.key_name
-  subnet_id     = aws_subnet.C.id
-  tags = { Name = "C-${count.index + 1}" }
+  subnet_id = aws_subnet.subnetC.id
+  tags = {
+
+    Name = "SubnetC-Instance-${count.index + 1}"
+  }
 }

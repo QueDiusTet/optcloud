@@ -1,32 +1,93 @@
-# Exercici 2 — Crear una VPC amb 3 subnets i 6 instàncies EC2
+# Exercici 2
+Creació d'instàncies a dins d'una VPC (Virtual Private Cloud) separades per Subnets.
 
-## Objectiu
-Crear una VPC (`10.0.0.0/16`) amb 3 subxarxes i 2 instàncies EC2 a cada subnet, totes a `us-east-1a`.
+Indiquem proveïdor
+```
+provider "aws" {
+  region = "us-east-1"
+}
+```
+Creem una VPC en la red 10.0.0.0/16
+```
+resource "aws_vpc" "vpc_prinsipal" {
+    cidr_block  = "10.0.0.0/16"
+    enable_dns_support = true
+    enable_dns_hostnames = true
 
----
+    tags = {
+        Name = "LLUK-VPC"
+    }
+}
+```
+Creem recursos de tipus *subnet*
+```
+resource "aws_subnet" "subnetA" {
+  vpc_id = aws_vpc.vpc_prinsipal.id
+  cidr_block = "10.0.32.0/25"
+  availability_zone = "us-east-1a"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "SubnetA"
+  }
+}
+resource "aws_subnet" "subnetB" {
+  vpc_id = aws_vpc.vpc_prinsipal.id
+  cidr_block = "10.0.30.0/23"
+  availability_zone = "us-east-1a"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "SubnetB"
+  }
+}
+resource "aws_subnet" "subnetC" {
+  vpc_id = aws_vpc.vpc_prinsipal.id
+  cidr_block = "10.0.33.0/28"
+  availability_zone = "us-east-1a"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "SubnetC"
+  }
+}
+```
+Creem recursos de tipus instància a cada subnet (subnet_id)
+```
+# Subnet A
+resource "aws_instance" "maquinas_subnetA" {
+  count = 2
+  ami = "ami-052064a798f08f0d3"
+  instance_type = "t3.micro"
+  subnet_id = aws_subnet.subnetA.id
+  tags = {
+ 
+    Name = "SubnetA-Instance-${count.index + 1}"
+  }
+}
+# Subnet B
+resource "aws_instance" "maquinas_subnetB" {
+  count = 2
+  ami = "ami-052064a798f08f0d3"
+  instance_type = "t3.micro"
+  subnet_id = aws_subnet.subnetB.id
+  tags = {
+ 
+    Name = "SubnetB-Instance-${count.index + 1}"
+  }
+}
+# Subnet C
+resource "aws_instance" "maquinas_subnetC" {
+  count = 2
+  ami = "ami-052064a798f08f0d3"
+  instance_type = "t3.micro"
+  subnet_id = aws_subnet.subnetC.id
+  tags = {
 
-## 🖥️ Part 1 — Fer-ho manualment a AWS
+    Name = "SubnetC-Instance-${count.index + 1}"
+  }
+}
+```
+Apply de terraform:
 
-1. AWS Console → **VPC → Create VPC**
-   - CIDR: `10.0.0.0/16`
-2. Crea 3 subnets dins la VPC:
-   - SubnetA: `10.0.32.0/25`
-   - SubnetB: `10.0.30.0/23`
-   - SubnetC: `10.0.33.0/28`
-3. Crea un Security Group amb port 22 obert per SSH.
-4. Crea 2 instàncies per cada subnet.
-5. Desa captures a `assets/Imatges/console-ex2-*.png`.
-
----
-
-## ⚙️ Part 2 — Fer-ho amb Terraform
-
-1. Copia l’AMI ID a `variables.tf`.
-2. Executa:
-   ```bash
-   terraform init
-   terraform plan
-   terraform apply
-   ```
-3. Comprova que tens 3 subxarxes i 6 instàncies.
-4. Desa captura a `assets/Imatges/terraform-ex2.png`.
+### Fet desde la GUI
+![alt text](<assets/images/awsec2.png>)
+### Topologia a Lucid:
+![alt text](<assets/images/lucid.png>)
